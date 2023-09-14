@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('客户列表')" />
+    <style>
+
+    </style>
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('customer')" />
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>客户列表管理</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <!--高级查询--->
+                <div style="margin: 10px;">
+                    <form class="form-inline" id="searchForm" action="/customer/list" method="post">
+                        <input type="hidden" name="currentPage" id="currentPage" value="1">
+                        <div class="form-group">
+                            <label for="keyword">关键字:</label>
+                            <input type="text" class="form-control" id="keyword" name="keyword" placeholder="请输入姓名或电话" th:field="${qo.keyword}">
+                        </div>
+                        <div class="form-group">
+                            <label for="status"> 状态:</label>
+                            <select class="form-control" id="status" name="status">
+                                <option value="">全部</option>
+                                <option th:value="0">流失</option>
+                                <option th:value="1">开发失败</option>
+                                <option th:value="2">潜在客户</option>
+                                <option th:value="3">正式客户</option>
+                                <option th:value="4">资源池客户</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sellerId"> 市场专员:</label>
+                            <select class="form-control" id="sellerId" name="sellerId">
+                                <option value="">全部</option>
+                                <option th:each="item:${sellers}" th:value="${item.id}" th:text="${item.name}"
+                                        th:selected="${qo.sellerId eq item.id}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> 查询</button>
+                        <a href="#" class="btn-input">
+                            <span class="glyphicon glyphicon-plus"></span> 添加客户
+                        </a>
+                    </form>
+                </div>
+                <div class="box-body table-responsive ">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>姓名</th>
+                            <th>年龄</th>
+                            <th>性别</th>
+                            <th>电话</th>
+                            <th>qq</th>
+                            <th>职业</th>
+                            <th>来源</th>
+                            <th>销售员</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item:${pageInfo?.list}">
+                            <td th:text="${(qo.currentPage-1)*qo.pageSize+(itemStat.index+1)}"></td>
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.age}"></td>
+                            <td th:switch="${item.gender}">
+                                <span th:case="0">女</span>
+                                <span th:case="1">男</span>
+                            </td>
+                            <td th:text="${item.tel}"></td>
+                            <td th:text="${item.qq}"></td>
+                            <td th:text="${item?.job?.title}"></td>
+                            <td th:text="${item?.source?.title}"></td>
+                            <td th:text="${item?.seller?.name}"></td>
+                            <td th:if="${item.status == 0}">流失</td>
+                            <td th:if="${item.status == 1}">开发失败</td>
+                            <td th:if="${item.status == 2}">潜在客户</td>
+                            <td th:if="${item.status == 3}">正式客户</td>
+                            <td th:if="${item.status == 4}">资源池客户</td>
+                            <td>
+                                <a href="#" class="btn_redirect" th:data-option="${item.toJson()}">
+                                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                                </a>
+                                <a href="#" class="btn-follow" th:data-option="${item.toJson()}">
+                                    <span class="glyphicon glyphicon-pencil"></span> 跟进
+                                </a>
+                                <a href="#" class="btn-updateStatus" th:data-option="${item.toJson()}">
+                                    <span class="glyphicon glyphicon-pencil"></span> 修改状态
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <th:block th:include="include :: page" />
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        // 打开添加模态窗口
+        $(".btn-input").click(function () {
+            var data = $(this).data("option");
+            $("#name").val("");
+            $("input[name='id']").val("");
+            $("#age").val("");
+            $("#gender").val("");
+            $("#tel").val("");
+            $("#qq").val("");
+            $("#job").val("");
+            $("#source").val("");
+            if (data){
+                $("#name").val(data.name);
+                $("input[name='id']").val(data.id);
+                $("#age").val(data.age);
+                $("#gender").val(data.gender);
+                $("#tel").val(data.tel);
+                $("#qq").val(data.qq);
+                $("#job").val(data.job);
+                $("#source").val(data.source);
+            }
+            $("#modal1").modal('show');
+        });
+
+/*        $("#insertCustomer").click(function () {
+            var id = $("input[name='id']").val();
+            var job = $("#job").val();
+            var source = $("#source").val();
+            $.ajax({
+                url: "/customer/saveOrUpdate",
+                data: {id:id,job:job,source:source},
+                type:"post",
+                success:function () {
+                    window.location.reload();
+                }
+            })
+        })*/
+    })
+</script>
+
+<!--新增客户的模态窗口-->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新增/编辑客户资料</h4>
+            </div>
+            <form action="/customer/saveOrUpdate" method="post">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">姓名:</label>
+                        <input type="text" class="form-control" name="name" id="name" placeholder="请输入姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">年龄:</label>
+                        <input type="text" class="form-control" name="age" id="age" placeholder="请输入年龄">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender"> 性别:</label>
+                        <select class="form-control" id="gender" name="gender">
+                            <option value="">请选择</option>
+                            <option value="1" th:selected="${gender=='1'}">男</option>
+                            <option value="0" th:selected="${gender=='0'}">女</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tel">电话:</label>
+                        <input type="text" class="form-control" name="tel" id="tel" placeholder="请输入电话">
+                    </div>
+                    <div class="form-group">
+                        <label for="qq">qq:</label>
+                        <input type="text" class="form-control" name="qq" id="qq" placeholder="请输入qq">
+                    </div>
+                    <div class="form-group">
+                        <label for="job">职业:</label>
+                        <select class="form-control" id="job" name="jobId" >
+                            <option value="">请选择</option>
+                            <option th:each="item:${pageInfoJob}" th:value="${item.id}" th:text="${item.title}"
+
+                            ></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="source">来源:</label>
+                        <select class="form-control" id="source" name="sourceId" >
+                            <option value="">请选择</option>
+                            <option th:each="item:${pageInfoSource}" th:value="${item.id}" th:text="${item.title}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="insertCustomer">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    $(function () {
+        // 打开编辑模态窗口
+        $(".btn_redirect").click(function () {
+            var data = $(this).data("option");
+            $("#customerName").val("");
+            $("input[name='id']").val("");
+            $("#oldSeller").val("");
+            $("#newSeller").val("");
+            $("#reason").val("");
+            if (data){
+                $("#customerName").val(data.name);
+                $("input[name='id']").val(data.id);
+                $("#oldSeller").val(data.oldSeller);
+                $("#newSeller").val(data.newSeller);
+                $("#reason").val(data.reason);
+            }
+            $("#modal2").modal('show');
+        });
+    })
+</script>
+<!--编辑客户的模态窗口-->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal2">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">新增/编辑</h4>
+            </div>
+            <form action="/customer/saveOrUpdate" method="post">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customerName">客户姓名:</label>
+                        <input type="text" class="form-control" name="customerName" id="customerName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="oldSeller">旧营销人员:</label>
+                        <input type="text" class="form-control" name="oldSeller" id="oldSeller" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="newSeller">新营销人员:</label>
+                        <select class="form-control" id="newSeller" name="newSeller"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reason">移交原因:</label>
+                        <textarea type="text" class="form-control" name="reason" id="reason"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<script>
+    $(function () {
+        // 打开跟进模态窗口
+        $(".btn-follow").click(function () {
+            var data = $(this).data("option");
+            $("#customerName-follow").val("");
+            $("input[name='id']").val("");
+            $("#traceTime").val("");
+            $("#traceDetails").val("");
+            $("#traceType").val("");
+            $("#traceResult").val("");
+            $("#remark").val("");
+            $("#followType").val("");
+            if (data){
+                $("#customerName-follow").val(data.name);
+                $("input[name='id']").val(data.id);
+                $("#traceTime").val(data.traceTime);
+                $("#traceDetails").val(data.traceDetails);
+                $("#traceType").val(data.traceType);
+                $("#traceResult").val(data.traceResult);
+                $("#remark").val(data.remark);
+                $("#followType").val(data.type);
+            }
+            $("#modal3").modal('show');
+        });
+
+/*        $("#updateFollow").click(function () {
+            var name = $("#customerName-follow").val();
+            var id = $("input[name='id']").val();
+            var traceTime = $("#traceTime").val();
+            var traceDetails = $("#traceDetails").val();
+            var traceType = $("#traceType").val();
+            var traceResult = $("#traceResult").val();
+            var remark = $("#remark").val();
+            var type = $("#type").val();
+            $.ajax({
+                url: "/customer/followEdit",
+                data: {id:id,traceTime:traceTime,traceDetails:traceDetails,traceType:traceType,traceResult:traceResult,remark:remark,type:type},
+                type:"post",
+                success:function () {
+                    window.location.reload();
+                }
+            })
+        })*/
+
+    })
+</script>
+<!--跟进客户的模态窗口-->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal3">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">跟进记录</h4>
+            </div>
+            <form action="/customer/followEdit" method="post">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customerName-follow">客户姓名:</label>
+                        <input type="text" class="form-control" name="customerName-follow" id="customerName-follow" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="traceTime">跟进时间:</label>
+                        <input type="text" class="form-control" name="traceTime" id="traceTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="traceDetails">跟进内容:</label>
+                        <input type="text" class="form-control" name="traceDetails" id="traceDetails">
+                    </div>
+                    <div class="form-group">
+                        <label for="traceType">跟进方式:</label>
+<!--                        <select class="form-control" id="traceType" name="traceTypeId">
+                        <option th:each="item:${pageInfoTraceType}" th:value="${item.id}" th:text="${item.title}"></option>
+                    </select>-->
+                        <select class="form-control" id="traceType" name="traceTypeId">
+                            <option th:each="item:${pageInfoTraceType}" th:value="${item.id}" th:text="${item.title}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="traceResult">跟进结果:</label>
+                        <select class="form-control" id="traceResult" name="traceResult">
+<!--                            <option th:each="item:${pageInfoTraceResult}" th:value="${item.id}" th:text="${item.traceResult}">-->
+                            <option value="3" th:selected="${traceResult=='3'}">优</option>
+                            <option value="2" th:selected="${traceResult=='2'}">中</option>
+                            <option value="1" th:selected="${traceResult=='1'}">差</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="remark">备注:</label>
+                        <textarea type="text" class="form-control" name="remark" id="remark"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="followType">跟进类型:</label>
+                        <select class="form-control" id="followType" name="type">
+<!--                         <option th:each="item:${pageInfoTraceHistory}" th:value="${item.id}" th:text="${item.type}">
+                             </option>-->
+                            <option value="0" th:selected="${followType=='0'}">潜在开发计划</option>
+                            <option value="1" th:selected="${followType=='1'}">客户跟进历史</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="updateFollow">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<script>
+    $(function () {
+        // 打开修改客户状态模态窗口
+        $(".btn-updateStatus").click(function () {
+            var data = $(this).data("option");
+            $("#customerStatus-name").val("");
+            $("input[name='id']").val("");
+            $("#customerStatus").val("");
+            if (data){
+                $("#customerStatus-name").val(data.name);
+                $("input[name='id']").val(data.id);
+                $("#customerStatus").val(data.status);
+            }
+            $("#modal4").modal('show');
+        });
+
+/*        $("#updateStatus").click(function () {
+            var name = $("#customerStatus-name").val();
+            var status = $("#customerStatus").val();
+            var id = $("input[name='id']").val();
+            $.ajax({
+                url: "/customer/saveOrUpdate",
+                data: {name:name,status:status,id:id},
+                type:"post",
+                success:function () {
+                    window.location.reload();
+                }
+            })
+        })*/
+    })
+</script>
+<!--修改客户状态的模态窗口-->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal4">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">修改客户状态</h4>
+            </div>
+            <!--            <form action="/customer/saveOrUpdate" method="post">-->
+            <form action="/customer/saveOrUpdate" method="post">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customerStatus-name">姓名:</label>
+                        <input type="text" class="form-control" name="name" id="customerStatus-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerStatus">状态:</label>
+                        <select class="form-control" id="customerStatus" name="status">
+                            <option value="0" th:selected="${customerStatus=='0'}">流失</option>
+                            <option value="1" th:selected="${customerStatus=='1'}">开发失败</option>
+                            <option value="2" th:selected="${customerStatus=='2'}">潜在用户</option>
+                            <option value="3" th:selected="${customerStatus=='3'}">正式用户</option>
+                            <option value="4" th:selected="${customerStatus=='4'}">资源池用户</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="updateStatus">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<th:block th:include="include :: footer" />
+</body>
+</html>
+
+
+
+
+
+
+

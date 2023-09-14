@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <context id="oraclegenerator" targetRuntime="MyBatis3">
+
+        <!--配置生成的javaBean的序列化插件-->
+         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+
+        <!--生成的JavaBean带上toString方法-->
+         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
+
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <!--jdbc连接数据库的配置-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql:///rbac"
+                        userId="root"
+                        password="123456"/>
+
+        <!--默认为false ，如果为false 表示 把JDBC Decimal 和 numeric 类型解析为 integer
+           当为true 时，表示把 JDBC Decimal 和 numeric 类型解析为 BigDecimal-->
+         <javaTypeResolver>
+              <property name="forceBigDecimals" value="true"/>
+         </javaTypeResolver>
+
+        <!--生成javaBean存放的位置-->
+        <javaModelGenerator targetPackage="com.bjpowernode.rbac.entity"
+                            targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <!--从数据库中返回的值被清理前后的空格-->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--生成mapper映射文件存放位置-->
+        <sqlMapGenerator targetPackage="com.bjpowernode.rbac.mapper"
+                         targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!--生成mapper接口文件的存放位置-->
+        <javaClientGenerator targetPackage="com.bjpowernode.rbac.mapper"
+                             type="XMLMAPPER" targetProject="src/main/java">
+            <!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 数据库表名及对应的Java模型类名 -->
+<!--        <table tableName="department" domainObjectName="Department"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+        <table tableName="employee" domainObjectName="Employee"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+
+        <table tableName="permission" domainObjectName="Permission"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+
+        <table tableName="role" domainObjectName="Role"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>-->
+
+        <table tableName="customertransfer" domainObjectName="CustomerTransfer"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+    </context>
+</generatorConfiguration>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('跟进历史管理')"/>
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar"/>
+    <th:block th:include="include :: menu('employee')"/>
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>跟进历史管理</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <!--高级查询--->
+                <div style="margin: 10px;">
+                    <form action="/history/toTraceHistoryPage" class="form-inline" id="searchForm" method="post">
+                        <input id="currentPage" name="currentPage" type="hidden" value="1">
+
+                        <input id="pageInfoList" th:value="${pageInfoList}" type="hidden">
+                        <div class="form-group">
+                            <label for="keyword">关键字:</label>
+                            <input class="form-control" id="keyword" name="keyword" placeholder="请输入姓名或电话"
+                                   th:field="${qo.keyword}" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="type"> 跟进类型:</label>
+                            <select class="form-control" id="type" name="type">
+                                <option value="">全部</option>
+                                <option th:each="item:${types}" th:field="${qo.type}" th:text="${item.title}"
+                                        th:value="${item.id}"></option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search"></span>
+                            查询
+                        </button>
+                    </form>
+                </div>
+                <div class="box-body table-responsive ">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>姓名</th>
+                            <th>跟进日期</th>
+                            <th>跟进内容</th>
+                            <th>跟进方式</th>
+                            <th>跟进结果</th>
+                            <th>录入人</th>
+                            <th>跟进类型</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item:${pageInfo?.list}">
+                            <td th:text="${(qo.currentPage-1)*qo.pageSize+(itemStat.index+1)}"></td>
+                            <td th:text="${item.customer?.name}"></td>
+                            <td id="traceTimeTd" th:text="${#dates.format(item.traceTime,'yyyy-MM-dd')}"></td>
+                            <td th:text="${item.traceDetails}"></td>
+                            <td th:text="${item?.traceTypes?.title}"></td>
+                            <td th:switch="${item.traceResult}">
+                                <span th:case="3">优</span>
+                                <span th:case="2">中</span>
+                                <span th:case="1">差</span>
+                            </td>
+                            <td th:text="${item?.inputUser?.name}"></td>
+                            <!--                            <td th:text="${item.employeeName}"></td>-->
+                            <!--                            <td th:switch="${item.status}">
+                                                            <span th:case="2">潜在客户</span>
+                                                            <span th:case="4">资源池客户</span>
+                                                        </td>-->
+                            <td th:text="${item?.types?.title}"></td>
+                            <!--                            <td th:switch="${item?.type}">
+                                                            <span th:case="0">潜在开发计划</span>
+                                                            <span th:case="1">正式客户跟进</span>
+                            &lt;!&ndash;                                <span th:case="2">常规跟进</span>
+                                                            <span th:case="3">其他</span>&ndash;&gt;
+                                                        </td>-->
+                            <td>
+                                <a class="btn btn-info btn-xs btn-follow" href="#" th:data-option='${item.toJson}'>
+                                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <th:block th:include="include :: page"/>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        // 打开跟进模态窗口
+        $(".btn-follow").click(function () {
+            var data = $(this).data("option");
+            var traceTime = $("#traceTimeTd").text();
+            console.log(data);
+            if (data) {
+                $("#customerName-follow").val(data.customer.name);
+                $("#traceTime").val(traceTime);
+                $("input[name='id']").val(data.customer.id);
+                $("#traceDetails").val(data.traceDetails);
+                $("#traceTypeId").val(data.traceTypes.id);
+                $("#traceResult").val(data.traceResults.id);
+                $("#remark").val(data.remark);
+                $("#followType").val(data.types.id);
+            }
+            $("#modal3").modal('show');
+        });
+    })
+</script>
+<!--跟进客户的模态窗口-->
+<div class="modal fade" id="modal3" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">跟进记录</h4>
+            </div>
+            <form action="/history/update" method="post">
+                <input name="id" type="hidden">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customerName-follow">客户姓名:</label>
+                        <input class="form-control" disabled id="customerName-follow" name="customerName" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="traceTime">跟进时间:</label>
+                        <input class="form-control" id="traceTime" name="traceTime" type="Date">
+                    </div>
+                    <div class="form-group">
+                        <label for="traceDetails">跟进内容:</label>
+                        <input class="form-control" id="traceDetails" name="traceDetails" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="traceTypeId">跟进方式:</label>
+                        <select class="form-control" id="traceTypeId" name="traceTypeId">
+                            <option value="">请选择</option>
+                            <option th:each="item:${traceTypeIds}" th:text="${item.title}"
+                                    th:value="${item.id}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="traceResult">跟进结果:</label>
+                        <select class="form-control" id="traceResult" name="traceResult">
+                            <!--                            <option th:each="item:${pageInfoTraceResult}" th:value="${item.id}" th:text="${item.traceResult}">-->
+                            <option th:selected="${traceResult=='3'}" value="3">优</option>
+                            <option th:selected="${traceResult=='2'}" value="2">中</option>
+                            <option th:selected="${traceResult=='1'}" value="1">差</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="remark">备注:</label>
+                        <textarea class="form-control" id="remark" name="remark" type="text"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="followType">跟进类型:</label>
+                        <select class="form-control" id="followType" name="type">
+                            <option value="">请选择</option>
+                            <option th:each="item:${types}" th:text="${item.title}" th:value="${item.id}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="updateFollow" type="submit">保存</button>
+                    <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<th:block th:include="include :: footer"/>
+</body>
+</html>
+

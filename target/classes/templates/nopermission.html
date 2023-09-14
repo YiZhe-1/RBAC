@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('无权限')" />
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('')" />
+    <div class="content-wrapper">
+        <section class="content">
+
+            <div class="error-page">
+                <h2 class="headline text-yellow"></h2>
+
+                <div class="error-content">
+                    <h3><i class="fa fa-warning text-yellow"></i> 您没有足够的权限访问该页面 </h3>
+                    <p>
+                        若要继续访问 ，请联系管理员开通 ，联系方式 ：110
+                    </p>
+
+
+                </div>
+            </div>
+            <!-- /.error-page -->
+
+        </section>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

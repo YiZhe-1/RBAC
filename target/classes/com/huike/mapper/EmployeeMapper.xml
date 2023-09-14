@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--与EmployeeMapper做动态绑定-->
+<mapper namespace="com.huike.mapper.EmployeeMapper">
+    <select id="findPage" resultType="com.huike.entity.Employee">
+        select *
+        from employee
+        where (name like '%${keyword}%' or email = '%${keyword}%')
+          and dept_id = '%${deptId}%'
+    </select>
+
+<!--    获取自动生成主键,给id-->
+
+    <insert id="addToEmployee" useGeneratedKeys="true" keyProperty="id">
+        insert into  employee values (null,#{name},#{password},#{email},#{age},#{admin},#{dept.id},#{username})
+    </insert>
+
+</mapper>

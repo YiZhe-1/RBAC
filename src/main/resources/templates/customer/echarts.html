@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('潜在客户报表')" />
+    <script src="/js/echarts/echarts.min.js"></script>
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+
+<script>
+    $(function () {
+
+    });
+</script>
+
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('customer')" />
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>潜在客户报表</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <!--高级查询--->
+                <div style="margin: 10px;">
+                    <form class="form-inline" id="searchForm" action="/customer/toReportsPage" method="post">
+                        <input type="hidden" name="currentPage" id="currentPage" value="1">
+                        <div class="form-group">
+                            <label for="keyword">分组类型数据查询:</label>
+                            <input type="text" class="form-control" id="keyword" name="keyword" placeholder="请输入分组类型数据:" th:field="${qo.keyword}">
+                        </div>
+                        <div class="form-group">
+                            <label>时间段查询:</label>
+                            <label>
+                                <input type='date' class='form-control ' id='dateBegin' name='dateBegin' value='' ng-model="dateBegin" th:field="${qo.dateBegin}">
+                            </label>
+                            -
+                            <label>
+                                <input type='date' class='form-control ' id='dateEnd' name='dateEnd' value='' ng-model="dateEnd" th:field="${qo.dateEnd}">
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="groupType">分组类型:</label>
+                            <select class="form-control" id="groupType" name="groupType" th:field="${qo.groupType}">
+                                <option th:value="0">员工</option>
+                                <option th:value="1">年</option>
+                                <option th:value="2">月</option>
+                                <option th:value="3">日</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> 查询</button>
+                        <button type="button" id="bingBtn" class="btn btn-warning"><span class="glyphicon glyphicon-search"></span>饼状图</button>
+                        <button type="button" id="zhuBtn" class="btn btn-info"><span class="glyphicon glyphicon-search"></span>柱状图</button>
+                    </form>
+                </div>
+                <div class="box-body table-responsive ">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>分组类型</th>
+                            <th>潜在客户新增数</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr th:each="item:${pageInfo?.list}">
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.num}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <th:block th:include="include :: page" />
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        var options = $("#groupType option:selected");
+        var subtext = options.text();
+        //柱状图
+        $("#zhuBtn").click(function () {
+            var data = $("#groupType").val();
+            var myChart;
+            $.ajax({
+                url:"/customer/zhuAjax",
+                data: {groupType:data},
+                dataType:"json",
+                success:function (data) {
+                    // 基于准备好的dom，初始化echarts实例
+                    myChart = echarts.init(document.getElementById('main'));
+                    // 指定图表的配置项和数据
+                    var option = {
+                        title: {
+                            text: '潜在客户报表-柱状图',
+                            left: 'center',
+                            subtext: subtext, //需要后端
+                        },
+                        tooltip: {},
+                        xAxis: {
+                            data:data.data1
+                        },
+                        yAxis: {
+                            name: '新增客户数'
+                        },
+                        toolbox:{
+                            show : true, //是否显示工具栏组件
+                            orient:"horizontal", //工具栏 icon 的布局朝向'horizontal' 'vertical'
+                            itemSize:15, //工具栏 icon 的大小
+                            itemGap:10, //工具栏 icon 每项之间的间隔
+                            showTitle:true, //是否在鼠标 hover 的时候显示每个工具 icon 的标题
+                            feature : {
+                                mark : { // '辅助线开关'
+                                    show: true
+                                },
+                                dataView : { //数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新
+                                    show: true, //是否显示该工具。
+                                    title:"数据视图",
+                                    readOnly: false, //是否不可编辑（只读）
+                                    lang: ['数据视图', '关闭', '刷新'], //数据视图上有三个话术，默认是['数据视图', '关闭', '刷新']
+                                    backgroundColor:"#fff", //数据视图浮层背景色。
+                                    textareaColor:"#fff", //数据视图浮层文本输入区背景色
+                                    textareaBorderColor:"#333", //数据视图浮层文本输入区边框颜色
+                                    textColor:"#000", //文本颜色。
+                                    buttonColor:"#c23531", //按钮颜色。
+                                    buttonTextColor:"#fff", //按钮文本颜色。
+                                },
+                                magicType: { //动态类型切换
+                                    show: true,
+                                    title:"切换", //各个类型的标题文本，可以分别配置。
+                                    type: ['line', 'bar'], //启用的动态类型，包括'line'（切换为折线图）, 'bar'（切换为柱状图）, 'stack'（切换为堆叠模式）, 'tiled'（切换为平铺模式）
+                                },
+                                restore : { //配置项还原。
+                                    show: true, //是否显示该工具。
+                                    title:"还原",
+                                },
+                                saveAsImage : { //保存为图片。
+                                    show: true, //是否显示该工具。
+                                    type:"png", //保存的图片格式。支持 'png' 和 'jpeg'。
+                                    name:"pic1", //保存的文件名称，默认使用 title.text 作为名称
+                                    backgroundColor:"#ffffff", //保存的图片背景色，默认使用 backgroundColor，如果backgroundColor不存在的话会取白色
+                                    title:"保存为图片",
+                                    pixelRatio:1 //保存图片的分辨率比例，默认跟容器相同大小，如果需要保存更高分辨率的，可以设置为大于 1 的值，例如 2
+                                },
+                            },
+                            zlevel:0, //所属图形的Canvas分层，zlevel 大的 Canvas 会放在 zlevel 小的 Canvas 的上面
+                            z:2, //所属组件的z分层，z值小的图形会被z值大的图形覆盖
+                            left:"right", //组件离容器左侧的距离,'left', 'center', 'right','20%'
+                            top:"top", //组件离容器上侧的距离,'top', 'middle', 'bottom','20%'
+                            right:"auto", //组件离容器右侧的距离,'20%'
+                            bottom:"auto", //组件离容器下侧的距离,'20%'
+                            width:"auto", //图例宽度
+                            height:"auto", //图例高度
+                        },
+                        series: [
+                            {
+                                name: '新增客户数',
+                                data:data.data2,
+                                type: 'bar'
+                            }
+                        ]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    myChart.setOption(option);
+                }
+            });
+            $("#modal1").modal('show');
+        });
+
+    //饼图
+    $("#bingBtn").click(function () {
+        var data = $("#groupType").val();
+        $.ajax({
+            url:"/customer/bingAjax",
+            data: {groupType:data},
+            dataType:"json",
+            success:function (data) {
+                // 基于准备好的dom，初始化echarts实例
+                var myChart = echarts.init(document.getElementById('main'));
+                // 指定图表的配置项和数据
+                option = {
+                    title: {
+                        text: '潜在客户报表-饼状图',
+                        subtext: subtext,
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: data.data1
+                    },
+                    toolbox:{
+                        show : true, //是否显示工具栏组件
+                        orient:"horizontal", //工具栏 icon 的布局朝向'horizontal' 'vertical'
+                        itemSize:15, //工具栏 icon 的大小
+                        itemGap:10, //工具栏 icon 每项之间的间隔
+                        showTitle:true, //是否在鼠标 hover 的时候显示每个工具 icon 的标题
+                        feature : {
+                            mark : { // '辅助线开关'
+                                show: true
+                            },
+                            dataView : { //数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新
+                                show: true, //是否显示该工具。
+                                title:"数据视图",
+                                readOnly: false, //是否不可编辑（只读）
+                                lang: ['数据视图', '关闭', '刷新'], //数据视图上有三个话术，默认是['数据视图', '关闭', '刷新']
+                                backgroundColor:"#fff", //数据视图浮层背景色。
+                                textareaColor:"#fff", //数据视图浮层文本输入区背景色
+                                textareaBorderColor:"#333", //数据视图浮层文本输入区边框颜色
+                                textColor:"#000", //文本颜色。
+                                buttonColor:"#c23531", //按钮颜色。
+                                buttonTextColor:"#fff", //按钮文本颜色。
+                            },
+                            magicType: { //动态类型切换
+                                show: true,
+                                title:"切换", //各个类型的标题文本，可以分别配置。
+                                type: ['line', 'bar'], //启用的动态类型，包括'line'（切换为折线图）, 'bar'（切换为柱状图）, 'stack'（切换为堆叠模式）, 'tiled'（切换为平铺模式）
+                            },
+                            restore : { //配置项还原。
+                                show: true, //是否显示该工具。
+                                title:"还原",
+                            },
+                            saveAsImage : { //保存为图片。
+                                show: true, //是否显示该工具。
+                                type:"png", //保存的图片格式。支持 'png' 和 'jpeg'。
+                                name:"pic1", //保存的文件名称，默认使用 title.text 作为名称
+                                backgroundColor:"#ffffff", //保存的图片背景色，默认使用 backgroundColor，如果backgroundColor不存在的话会取白色
+                                title:"保存为图片",
+                                pixelRatio:1 //保存图片的分辨率比例，默认跟容器相同大小，如果需要保存更高分辨率的，可以设置为大于 1 的值，例如 2
+                            },
+                        },
+                        zlevel:0, //所属图形的Canvas分层，zlevel 大的 Canvas 会放在 zlevel 小的 Canvas 的上面
+                        z:2, //所属组件的z分层，z值小的图形会被z值大的图形覆盖
+                        left:"right", //组件离容器左侧的距离,'left', 'center', 'right','20%'
+                        top:"top", //组件离容器上侧的距离,'top', 'middle', 'bottom','20%'
+                        right:"auto", //组件离容器右侧的距离,'20%'
+                        bottom:"auto", //组件离容器下侧的距离,'20%'
+                        width:"auto", //图例宽度
+                        height:"auto", //图例高度
+                    },
+                    series: [
+                        {
+                            name: 'Access From',
+                            type: 'pie',
+                            radius: '50%',
+                            data: data.data2,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            },
+                            itemStyle: {
+                                emphasis: {
+                                    itemStyle: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                },
+                                normal:{
+                                    color: function (params) {
+                                        var colorList = [
+                                            '#87CEFA','#DA70D6','#FF7F50','#FFFF00','#90EE90','#AABBCC','#ABEDBC'
+                                        ];
+                                        return colorList[params.dataIndex]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            }
+        });
+        $("#modal1").modal('show');
+    });
+    });
+</script>
+
+<!--打开echarts图的模态窗口-->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="main" style="width: 500px;height:500px; margin:0 auto;padding-top: 50px" ></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<th:block th:include="include :: footer" />
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!-- 通用CSS和JS -->
+<head th:fragment=header(title)>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<title th:text="${title}"></title>
+	<link rel="shortcut icon" href="favicon.ico">
+
+	<link rel="stylesheet" href="/js/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="/js/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/js/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="/js/adminlte/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="/js/adminlte/css/skins/_all-skins.min.css">
+	<link rel="stylesheet" href="/js/adminlte/css/fonts.googleapis.com.css">
+
+	<script src="/js/jquery/jquery.min.js"></script>
+	<script src="/js/bootstrap/js/bootstrap.js"></script>
+	<script src="/js/adminlte/js/adminlte.min.js"></script>
+	<script src="/js/plugins/twbsPagination/jquery.twbsPagination.min.js"></script>
+	<script type="text/javascript" src="/js/plugins/jquery-form/jquery.form.js"></script>
+	<script src="/js/system/commonAll.js"></script>
+
+
+	<!--引入验证插件的样式文件-->
+	<link rel="stylesheet" href="/js/plugins/bootstrap-validator/css/bootstrapValidator.min.css"/>
+	<!--引入验证插件的js文件-->
+	<script type="text/javascript" src="/js/plugins/bootstrap-validator/js/bootstrapValidator.min.js"></script>
+	<!--中文语言库-->
+	<script type="text/javascript" src="/js/plugins/bootstrap-validator/js/language/zh_CN.js"></script>
+
+
+	<!--引入日期插件的样式文件-->
+	<link rel="stylesheet" href="/js/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css"/>
+	<!--引入日期插件的js文件-->
+	<script type="text/javascript" src="/js/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+	<!--引入中文国际化文件-->
+	<script type="text/javascript" src="/js/plugins/bootstrap-datetimepicker/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+	<link rel="stylesheet" href="/js/plugins/sweetalert2/sweetalert2.min.css">
+	<script src="/js/plugins/sweetalert2/sweetalert2.min.js"></script>
+
+	<style>
+		.swal2-popup,.swal2-container{
+			font-size:1.5rem !important
+		}
+	</style>
+</head>
+<!--头部导航-->
+<div th:fragment=navbar >
+	<div class="main-header">
+		<a href="#" class="logo" style="background-color: #222d32;color: #fff;border-right: none;border-bottom: 1px solid grey;">
+			<span class="logo-mini">crm</span>
+			<span class="logo-lg"><b>客户关系管理</b></span>
+		</a>
+		<!-- Header Navbar: style can be found in header.less -->
+		<nav class="navbar navbar-static-top" >
+			<!-- Sidebar toggle button-->
+			<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>
+
+			<div class="navbar-custom-menu">
+				<ul class="nav navbar-nav">
+					<li class="dropdown messages-menu">
+						<a href="#">
+							<i class="fa fa-envelope-o"></i>
+						</a>
+					</li>
+					<li class="dropdown tasks-menu">
+						<a href="#" >
+							<i class="fa fa-flag-o"></i>
+						</a>
+					</li>
+					<li class="dropdown notifications-menu">
+						<a href="#" >
+							<i class="fa fa-bell-o"></i>
+						</a>
+					</li>
+					<li>
+						<a href="#"  class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-gears"></i></a>
+						<ul class="dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close" style="min-width: 100px;">
+							<li>
+								<a href="#">
+									<i class="fa fa-cog" ></i>
+									个人设置
+								</a>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<a href="#">
+									<i class=" fa fa-user"></i>
+									修改密码
+								</a>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<a href="/user/logout">
+									<i class="fa fa-power-off"></i>
+									注销
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+</div>
+<!--菜单-->
+<div th:fragment=menu(menu)>
+	<aside class="main-sidebar ">
+		<section class="sidebar">
+			<!-- Sidebar user panel -->
+			<div class="user-panel">
+				<div class="pull-left image">
+					<img src="/js/adminlte/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+				</div>
+				<div class="pull-left info">
+					<p>[[${session.EMPLOYEE_IN_SESSION?.username}]]</p>
+					<a href="#"><i class="fa fa-circle text-success"></i>在线</a>
+				</div>
+			</div>
+			<!-- search form -->
+			<form action="#" method="get" class="sidebar-form">
+				<div class="input-group">
+					<input type="text" name="q" class="form-control" placeholder="Search...">
+					<span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+              </span>
+				</div>
+			</form>
+			<ul class="sidebar-menu" data-widget="tree" id="menu1">
+				<li class="treeview">
+					<a href="#">
+						<i class="fa fa-dashboard"></i> <span>系统管理</span>
+						<span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+					</a>
+					<ul class="treeview-menu">
+						<li name="department"><a href="/department/list"><i class="fa fa-circle-o"></i> 部门管理</a></li>
+						<li name="employee"><a href="/employee/list"><i class="fa fa-circle-o"></i> 员工管理</a></li>
+						<li name="role"><a href="/role/list"><i class="fa fa-circle-o"></i> 角色管理</a></li>
+						<li name="permission"><a href="/permission/list"><i class="fa fa-circle-o"></i> 权限管理</a></li>
+					</ul>
+				</li>
+			</ul>
+
+			<ul class="sidebar-menu" data-widget="tree" id="menu2">
+				<li class="treeview">
+					<a href="#">
+						<i class="fa fa-dashboard"></i> <span>客户管理</span>
+						<span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+					</a>
+					<ul class="treeview-menu">
+						<li name="customerList"><a href="/customer/list"><i class="fa fa-circle-o"></i>客户列表</a></li>
+						<li name="potentialCustomer"><a href="/customer/potentialCustomer"><i class="fa fa-circle-o"></i>潜在客户</a></li>
+						<li name="customerPool"><a href="/customer/customerPool"><i class="fa fa-circle-o"></i>客户池</a></li>
+						<li name="failCustomer"><a href="/customer/failCustomer"><i class="fa fa-circle-o"></i>失败客户</a></li>
+						<li name="formalCustomer"><a href="/customer/formalCustomer"><i class="fa fa-circle-o"></i>正式客户</a></li>
+						<li name="loseCustomer"><a href="/customer/loseCustomer"><i class="fa fa-circle-o"></i>流失客户</a></li>
+					</ul>
+				</li>
+			</ul>
+
+
+			<ul class="sidebar-menu" data-widget="tree">
+				<li class="treeview">
+					<a href="#">
+						<i class="fa fa-pencil-square-o"></i> <span>客户历史</span>
+						<span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+					</a>
+					<ul class="treeview-menu">
+						<li name="traceHistory"><a href="/history/toTraceHistoryPage"><i class="fa fa-circle-o"></i>跟进历史管理</a></li>
+						<li name="transferHistory"><a href="/history/toTransferPage"><i class="fa fa-circle-o"></i>移交历史管理</a></li>
+					</ul>
+				</li>
+			</ul>
+
+			<ul class="sidebar-menu" data-widget="tree">
+				<li class="treeview">
+					<a href="#">
+						<i class="fa fa-bar-chart"></i> <span>报表统计</span>
+						<span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+					</a>
+					<ul class="treeview-menu">
+						<li name="employee"><a href="/customer/toReportsPage"><i class="fa fa-circle-o"></i> 页面实例图</a></li>
+					</ul>
+				</li>
+			</ul>
+
+		</section>
+	</aside>
+
+	<script th:inline="javascript">
+        $(function () {
+            //菜单初始
+            // $('.sidebar-menu').tree();
+            //菜单激活
+            var cuLi = $('.treeview-menu li[name=[[${menu}]]]');
+            cuLi.addClass("active");
+            cuLi.closest(".treeview").addClass("active")
+        })
+	</script>
+</div>
+
+<div th:fragment=footer >
+	<div class="main-footer">
+
+	</div>
+</div>
+<div th:fragment=page>
+	<div style="text-align: center;">
+		<ul id="pagination" class="pagination"></ul>
+	</div>
+	<script th:inline="javascript">
+        //分页
+        $(function(){
+            $('#pagination').twbsPagination({
+                totalPages:  [[${pageInfo?.pages}]] || 1,
+                startPage: [[${pageInfo?.pageNum}]] || 1,
+                first:'首页',
+                prev:'上一页',
+                next:'下一页',
+                last:'尾页',
+                visiblePages: 5,
+                onPageClick: function (event, page) {
+                $('#currentPage').val(page);
+                $('#searchForm').submit();
+            }
+        });
+        })
+	</script>
+</div>

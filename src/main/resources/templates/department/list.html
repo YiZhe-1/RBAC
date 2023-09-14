@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"  xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
+<head>
+    <th:block th:include="include :: header('部门列表')" />
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('department')" />
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>部门管理</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <!--高级查询--->
+                <form class="form-inline" id="searchForm" action="/department/list" method="post">
+                    <input type="hidden" name="currentPage" id="currentPage" value="1">
+                    <div shiro:hasPermission="department:saveOrUpdate">
+                    <a href="#" class="btn btn-success btn-input"  style="margin: 10px" >
+                        <span class="glyphicon glyphicon-plus"></span> 添加
+                    </a>
+                    </div>
+                </form>
+                <!--编写内容-->
+                <div class="box-body table-responsive ">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>部门名称</th>
+                            <th>部门编号</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <div shiro:hasPermission="department:list">
+                        <tr th:each="item:${pageInfo?.list}">
+                            <td th:text="${(qo.currentPage-1)*qo.pageSize+(itemStat.index+1)}"></td>
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.sn}"></td>
+                            <td>
+                                <div shiro:hasPermission="department:input">
+                                <a href="#" class="btn btn-info btn-xs btn-input" th:data-option="${item.toJson()}">
+                                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                                </a>
+                                </div>
+
+                                <div shiro:hasPermission="department:delete">
+                                <a class="btn btn-danger btn-xs btn-delete" th:data-url="@{'/department/delete?id='+${item.id}}">
+                                    <span class="glyphicon glyphicon-trash"></span> 删除
+                                </a>
+                                </div>
+
+                            </td>
+                        </tr>
+                        </div>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <th:block th:include="include :: page" />
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script>
+    $(function () {
+        $(".btn-input").click(function () {
+            var data = $(this).data("option");
+            $("#name").val("");
+            $("input[name='id']").val("");
+            $("#sn").val("");
+            if (data){
+                $("#name").val(data.name);
+                $("input[name='id']").val(data.id);
+                $("#sn").val(data.sn);
+            }
+            $(".modal").modal('show');
+        })
+    })
+
+</script>
+<div class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">部门编辑</h4>
+            </div>
+            <form action="/department/saveOrUpdate" method="post">
+                <input type="hidden" name="id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">名称</label>
+                        <input type="text" class="form-control" name="name" id="name" placeholder="名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="sn">缩写</label>
+                        <input type="text" class="form-control" name="sn" id="sn" placeholder="缩写">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<th:block th:include="include :: footer" />
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

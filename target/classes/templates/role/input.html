@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('角色新增/编辑')" />
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('role')" />
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>角色管理</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <form class="form-horizontal" action="/role/saveOrUpdate" method="post" id="editForm" >
+                    <input type="hidden" name="id" th:value="${role?.id}">
+                    <div class="form-group"  style="margin-top: 10px;">
+                        <label  class="col-sm-2 control-label">角色名称：</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control"  name="name"  placeholder="请输入角色名称" th:value="${role?.name}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">角色编号：</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control"  name="sn"  placeholder="请输入角色编号" th:value="${role?.sn}">
+                        </div>
+                    </div>
+                    <div class="form-group " id="role">
+                        <label for="role" class="col-sm-2 control-label">分配权限：</label><br/>
+                        <div class="row" style="margin-top: 10px">
+                            <div class="col-sm-2 col-sm-offset-2">
+                                <select multiple class="form-control allPermissions" style="height: 350px;" size="15">
+                                    <option th:each="permission:${permissions}" th:value="${permission.id}" th:text="${permission.name}"></option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-sm-1" style="margin-top: 60px;" align="center">
+                                <div>
+
+                                    <a type="button" class="btn btn-primary" style="margin-top: 10px" title="右移动"
+                                       onclick="moveSelected('allPermissions', 'selfPermissions')">
+                                        <span class="glyphicon glyphicon-menu-right"></span>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a type="button" class="btn btn-primary " style="margin-top: 10px" title="左移动"
+                                       onclick="moveSelected('selfPermissions', 'allPermissions')">
+                                        <span class="glyphicon glyphicon-menu-left"></span>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a type="button" class="btn btn-primary " style="margin-top: 10px" title="全右移动"
+                                       onclick="moveAll('allPermissions', 'selfPermissions')">
+                                        <span class="glyphicon glyphicon-forward"></span>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a type="button" class="btn btn-primary " style="margin-top: 10px" title="全左移动"
+                                       onclick="moveAll('selfPermissions', 'allPermissions')">
+                                        <span class="glyphicon glyphicon-backward"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <select multiple class="form-control selfPermissions" style="height: 350px;" size="15" name="permissionIds">
+                                    <option th:each="permission:${role?.permissionList}" th:value="${permission.id}" th:text="${permission.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        $(function () {
+
+                            // 把自己拥有的角色的id 进行提取，装入一个数组中
+                            var idArr = $(".selfPermissions > option").map(function () {
+                                return $(this).val();
+                            });
+
+                            $(".allPermissions > option").each(function (index,element) {
+                                if ($.inArray($(element).val(),idArr)!=-1){
+                                    $(element).remove();
+                                }
+                            });
+
+                            $(".btn-submit").click(function () {
+                                $(".selfPermissions > option").each(function () {
+                                    $(this).prop("selected",true);
+                                });
+
+                                $("#editForm").submit();
+                            })
+                        });
+
+                        function moveSelected(source,target) {
+                            $("." + target).append($("." + source + " > option:selected"));
+                        }
+                        function moveAll(source,target) {
+                            $("." + target).append($("." + source + " > option"));
+                        }
+                    </script>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-1 col-sm-6">
+                            <button type="button" class="btn btn-primary btn-submit">保存</button>
+                            
+                            <a href="javascript:window.history.back()" class="btn btn-danger">取消</a>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

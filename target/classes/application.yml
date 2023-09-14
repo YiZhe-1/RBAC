@@ -1,0 +1,39 @@
+#端口
+server:
+  port: 8081
+
+#thymeleaf的配置
+spring:
+  thymeleaf:
+    cache: false
+  datasource:
+    druid:
+      url: jdbc:mysql:///rbac
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  main:
+    allow-circular-references: true #放开不允许循环依赖的要求
+
+#mybatis懒加载配置
+mybatis:
+  configuration:
+    lazy-load-trigger-methods: clone
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+    map-underscore-to-camel-case: true #开启驼峰命名
+
+#pageHelper的配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  page-size-zero: true
+
+## 设置 mapper 日志打印级别
+logging:
+  level:
+    com:
+      huike:
+        mapper: debug
+  pattern:
+    dateformat: MM-dd HH:mm:ss:SSS

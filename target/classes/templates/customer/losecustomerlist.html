@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('流失客户管理')" />
+    <style>
+
+    </style>
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('customer')" />
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>流失客户管理</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <!--高级查询--->
+                <div style="margin: 10px;">
+                    <form class="form-inline" id="searchForm" action="/customer/loseCustomer" method="post">
+                        <input type="hidden" name="currentPage" id="currentPage" value="1">
+                        <div class="form-group">
+                            <label for="keyword">关键字:</label>
+                            <input type="text" class="form-control" id="keyword" name="keyword" placeholder="请输入姓名或电话" th:field="${qo.keyword}">
+                        </div>
+                        <div class="form-group">
+                            <label for="sellerId"> 市场专员:</label>
+                            <select class="form-control" id="sellerId" name="sellerId">
+                                <option value="">全部</option>
+                                <option th:each="item:${sellers}" th:value="${item.id}" th:text="${item.name}"
+                                        th:selected="${qo.sellerId eq item.id}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> 查询</button>
+                    </form>
+                </div>
+                <div class="box-body table-responsive ">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>姓名</th>
+                            <th>年龄</th>
+                            <th>性别</th>
+                            <th>电话</th>
+                            <th>qq</th>
+                            <th>职业</th>
+                            <th>来源</th>
+                            <th>销售员</th>
+                            <th>状态</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item:${pageInfo?.list}">
+                            <td th:text="${(qo.currentPage-1)*qo.pageSize+(itemStat.index+1)}"></td>
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.age}"></td>
+                            <td th:switch="${item.gender}">
+                                <span th:case="0">女</span>
+                                <span th:case="1">男</span>
+                            </td>
+                            <td th:text="${item.tel}"></td>
+                            <td th:text="${item.qq}"></td>
+                            <td th:text="${item?.job?.title}"></td>
+                            <td th:text="${item?.source?.title}"></td>
+                            <td th:text="${item?.seller?.name}"></td>
+                            <td th:if="${item.status == 0}">流失</td>
+                            <td th:if="${item.status == 1}">开发失败</td>
+                            <td th:if="${item.status == 2}">潜在客户</td>
+                            <td th:if="${item.status == 3}">正式客户</td>
+                            <td th:if="${item.status == 4}">资源池客户</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <th:block th:include="include :: page" />
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('角色列表')" />
+</head>
+<body class="hold-transition skin-black sidebar-mini">
+<div class="wrapper">
+    <th:block th:include="include :: navbar" />
+    <th:block th:include="include :: menu('role')" />
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>角色管理</h1>
+        </section>
+        <section class="content">
+            <div class="box">
+                <!--高级查询--->
+                <div style="margin: 10px;">
+                    <form class="form-inline" id="searchForm" action="/role/list" method="post">
+                        <input type="hidden" name="currentPage" id="currentPage" value="1">
+                        <a href="/role/input" class="btn btn-success btn-input">
+                            <span class="glyphicon glyphicon-plus"></span> 添加
+                        </a>
+                    </form>
+                </div>
+                <div class="box-body table-responsive ">
+                    <table class="table table-hover table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>角色名称</th>
+                            <th>角色编号</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item:${pageInfo?.list}">
+                            <td th:text="${(qo.currentPage-1)*qo.pageSize+(itemStat.index+1)}"></td>
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.sn}"></td>
+                            <td>
+                                <a th:href="@{'/role/input?id='+${item.id}}" class="btn btn-info btn-xs btn_redirect">
+                                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                                </a>
+                                <a th:data-url="@{'/role/delete?id='+${item.id}}" class="btn btn-danger btn-xs btn-delete">
+                                    <span class="glyphicon glyphicon-trash"></span> 删除
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <th:block th:include="include :: page" />
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
